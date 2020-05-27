@@ -70,19 +70,19 @@ class Camp:
 
 ## Cabin class which stores the number of campers, their activity preferences,
 class Cabin:
-    def __init__(self, campers, active = False):
+    def __init__(self, campers):
         self.campers = campers
-        self.active = active
-        self.a_day_activities = {"Period One":None,
+        self.picks = None
+        self.Activities = {"A-Day":{"Period One":None,
                                  "Period Two":None,
-                                 "Period Three":None}
-        self.b_day_activities = {"Period One":None,
+                                 "Period Three":None},
+                           "B-Day":{"Period One":None,
                                  "Period Two":None,
-                                 "Period Three":None}
+                                 "Period Three":None}}
 
     def Picks(self, picks):
         self.picks = picks
-        return picks
+        return self.picks
     
 class Schedule:
     def __init__(self, activity_list = ACTIVITIES, locations = LOCATIONS):
@@ -92,17 +92,18 @@ class Schedule:
 
     def create(self, cabins):
         for cabin in cabins:
-            if cabin.active:
-                self.schedule[cabin] = [cabin.a_day_activities, cabin.b_day_activities]
+                self.schedule[cabin] = cabin.Activities
 
-    def draft(self, picks):
+    def draft(self):
+        print(Sixteen.picks)
         return
         
             
 def schedule(camp):
     s = Schedule()
     s.create(camp.cabin_list)
-    print(s.schedule[22])
+    for item in s.schedule:
+        print(s.schedule[item])
 ##    except NameError:
 ##        print("You have likely not filled out all active cabin's activity preferences")
 ##    except:
@@ -120,37 +121,42 @@ def Change_Schedule(self, current_activity, desired_activity):
         
 
 ## Initialize cabins at camp
-Cabin_One = Cabin(1, True)
-Cabin_Two = Cabin(2)
-Cabin_Three = Cabin(3)
-Cabin_Four = Cabin(4)
-Cabin_Five = Cabin(5)
-Cabin_Six = Cabin(6)
-Cabin_Seven = Cabin(7, True)
-Cabin_Eight = Cabin(8)
-Cabin_Nine = Cabin(9)
-Cabin_Ten = Cabin(10)
-Cabin_Eleven = Cabin(11)
-Cabin_Twleve = Cabin(12)
-Cabin_Thirteen = Cabin(13, True)
-Cabin_Fourteen = Cabin(14)
-Cabin_Fifteen = Cabin(15)
-Cabin_Sixteen = Cabin(16)
-Cabin_Seventeen = Cabin(17)
-Cabin_Eighteen = Cabin(18)
-Cabin_Nineteen = Cabin(19)
-Cabin_Twenty = Cabin(20)
-Cabin_Twentyone = Cabin(21)
-Cabin_Twentytwo = Cabin(22)
-Cabin_Twentythree = Cabin(23, True)
+One = Cabin(8)
+Two = Cabin(8)
+Three = Cabin(8)
+Four = Cabin(8)
+Five = Cabin(8)
+Six = Cabin(6)
+Seven = Cabin(7)
+Eight = Cabin(8)
+Nine = Cabin(8)
+Ten = Cabin(8)
+Eleven = Cabin(8)
+Twleve = Cabin(8)
+Thirteen = Cabin(8)
+Fourteen = Cabin(8)
+Fifteen = Cabin(8)
+Sixteen = Cabin(8)
+Seventeen = Cabin(8)
+Eighteen = Cabin(8)
+Nineteen = Cabin(8)
+Twenty = Cabin(8)
+Twentyone = Cabin(8)
+Twentytwo = Cabin(8)
+Twentythree = Cabin(8)
 
 ## Create Older/Younger cabin splits
 
-Younger_Camp_List = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,23,24,25,15,16]
-Older_Camp_List = [26,27,28,15,16,17,30,31,32,33,34,35,18,19,20,21,22]
+Younger_Camp_List = [One, Two, Three]
+Older_Camp_List = [Fifteen, Sixteen, Seventeen]
 
 YoungerCamp = Camp("Younger Camp", Younger_Camp_List, 0)
 OlderCamp = Camp("Older Camp", Older_Camp_List, 1)
 
 
-OlderSchedule = schedule(OlderCamp)
+OlderSchedule = schedule(Older_Camp_List)
+
+
+## Insert Picks
+
+Sixteen.Picks({"Horseback":28,"Challenge Course":15})
