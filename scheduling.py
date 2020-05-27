@@ -11,7 +11,7 @@
     
     MIT License
 '''
-
+import random
 ## Availible locations around camp which are availible for use during land activities
 
 LOCATIONS = {"Archery":1,
@@ -34,7 +34,7 @@ LOCATIONS = {"Archery":1,
              "Volleyball":1,
              "Tree Climbing":1,
              "Gaga":1,
-             "Frisbee":2,
+             "Disc Golf":2,
              "Horseback":1}
 
 ## Activity class definition
@@ -45,11 +45,29 @@ class Activity:
 
 ## Define Open Activities and their respective locations
 
-ACTIVITIES = {"Challenge Course":"Challenge Course",
-              "Soccer":"field",
-              "Football":"field",
+ACTIVITIES = {"Archery":"Archery",
+              "Arts and Crafts":"Arts and Crafts",
+              "Athletic Conditioning":"Loop",
+              "BYG":"Duke",
+              "Basketball":["Basketball Court","Duke"],
+              "Challenge Course":"Challenge Course",
+              "Drama":["Rec Hall","Rec Hall Porch", "Ampitheatre"],
+              "Dance":["Rec Hall","Rec Hall Porch", "Ampitheatre"],
+              "Cheer":["Rec Hall","Rec Hall Porch", "Ampitheatre"],
+              "Fishing":"Fishing",
+              "Soccer":"Field",
+              "Football":"Field",
+              "Ultimate":"Field",
+              "Lacrosse":"Field",
+              "Guitar":"Guitar",
+              "OLS":"OLS",
+              "Pottery":"Pottery",
               "Riflery": "Riflery",
-              "Backyard Games":"Duke",
+              "Tennis":"Tennis",
+              "Volleyball":"Volleyball",
+              "Tree Climbing":"Tree Climbing",
+              "Gaga":"Gaga",
+              "Disc Golf":"Disc Golf",
               "Horseback":"Horseback"}
 
 
@@ -100,60 +118,81 @@ class Schedule:
     def get_next_choice(self, cabin):
         return (max(cabin.picks, key=cabin.picks.get))
 
-    def assign_activity(self, cabin):
-        choice = self.get_next_choice(cabin)
-        choice_location = ACTIVITIES[choice]
-
+    def assign(self, cabin, activity, location, last_location_to_try = True):
         ## Try to assign choice location to cabin during any time slot
         for x in range(len(self.open_locations)):
-
+            
             ## If there is an open locaiton for this activity during an
             ## activity period, assign it and decrease location openings by 1
             ## for that activity period
-            if self.open_locations[x][choice_location] != 0:
+            if self.open_locations[x][location] != 0:
                 if x == 0 and self.schedule[cabin]["A-Day"]["Period One"] == None:
-                    self.schedule[cabin]["A-Day"]["Period One"] = choice
-                    self.open_locations[x][choice_location] -= 1
-                    cabin.picks.pop(choice)
-                    break
+                    self.schedule[cabin]["A-Day"]["Period One"] = activity
+                    self.open_locations[x][location] -= 1
+                    cabin.picks.pop(activity)
+                    return True
                 elif x == 1 and self.schedule[cabin]["A-Day"]["Period Two"] == None:
-                    self.schedule[cabin]["A-Day"]["Period Two"] = choice
-                    self.open_locations[x][choice_location] -= 1
-                    cabin.picks.pop(choice)
-                    break
-                elif x == 2 and self.schedule[cabin]["A-Day"]["Period Three"]:
-                    self.schedule[cabin]["A-Day"]["Period Three"] = choice
-                    self.open_locations[x][choice_location] -= 1
-                    cabin.picks.pop(choice)
-                    break
+                    self.schedule[cabin]["A-Day"]["Period Two"] = activity
+                    self.open_locations[x][location] -= 1
+                    cabin.picks.pop(activity)
+                    return True
+                elif x == 2 and self.schedule[cabin]["A-Day"]["Period Three"] == None:
+                    self.schedule[cabin]["A-Day"]["Period Three"] = activity
+                    self.open_locations[x][location] -= 1
+                    cabin.picks.pop(activity)
+                    return True
                 elif x == 3 and self.schedule[cabin]["B-Day"]["Period One"] == None:
-                    self.schedule[cabin]["B-Day"]["Period One"] = choice
-                    self.open_locations[x][choice_location] -= 1
-                    cabin.picks.pop(choice)
-                    break
+                    self.schedule[cabin]["B-Day"]["Period One"] = activity
+                    self.open_locations[x][location] -= 1
+                    cabin.picks.pop(activity)
+                    return True
                 elif x == 4 and self.schedule[cabin]["B-Day"]["Period Two"] == None:
-                    self.schedule[cabin]["B-Day"]["Period Two"] = choice
-                    self.open_locations[x][choice_location] -= 1
-                    cabin.picks.pop(choice)
-                    break
+                    self.schedule[cabin]["B-Day"]["Period Two"] = activity
+                    self.open_locations[x][location] -= 1
+                    cabin.picks.pop(activity)
+                    return True
                 elif x == 5 and self.schedule[cabin]["B-Day"]["Period Three"] == None:
-                    self.schedule[cabin]["B-Day"]["Period Three"] = choice
-                    self.open_locations[x][choice_location] -= 1
-                    cabin.picks.pop(choice)
-                    break
-            elif x == 5:
-                increase_next_choice = cabin.picks.pop(choice)/2
-                new_choice = self.get_next_choice(cabin)
-                cabin.picks[new_choice]+=increase_next_choice
+                    self.schedule[cabin]["B-Day"]["Period Three"] = activity
+                    self.open_locations[x][location] -= 1
+                    cabin.picks.pop(activity)
+                    return True
+            elif x == 5 and last_location_to_try == True:
+                increase_next_choice = cabin.picks.pop(activity)/2
+                new_activity = self.get_next_choice(cabin)
+                cabin.picks[new_activity]+=increase_next_choice
                 self.assign_activity(cabin)
+        return False
+
+    def assign_activity(self, cabin):
+        choice = self.get_next_choice(cabin)
+        choice_location = ACTIVITIES[choice]
+        if type(choice_location) == list:
+            for l in choice_location:
+                if l == len(choice_location)-1:
+                    last_location_to_try = True
+                else:
+                    last_location_to_try = False
+                # Check if the assignment finished, if so break out, if not try again
+                check = self.assign(cabin, choice, l, last_location_to_try)
+                if check == True:
+                    break
+        else:
+            self.assign(cabin, choice, choice_location)
 
     def draft(self):
-        for cabin in self.schedule:
-            try:
+        try:
+            for cabin in self.schedule:
                 self.assign_activity(cabin)
-            except AttributeError:
-                print("You have not filled out enough of cabin",cabin.number+"'s activity preferences")
-        #print(draftround)
+        except AttributeError:
+            print("You have not filled out enough of cabin",cabin.number+"'s activity preferences")
+
+    def open_activities(self):
+        for period in range(len(self.open_locations)):
+            if period < 4:
+                day = "A"
+            else:
+                day = "B"
+            print(day,"Day","activity period",period%3+1,"has the following locations availible:\n",self.open_locations[period])
         
             
 def schedule(camp):
@@ -202,11 +241,13 @@ Twenty = Cabin("Twenty",8)
 Twentyone = Cabin("Twentyone",8)
 Twentytwo = Cabin("Twentytwo",8)
 Twentythree = Cabin("Twentythree",8)
+Twentyfour = Cabin("Twentyfour",8)
+Twentyfive = Cabin("Twentyfive",8)
 
 ## Create Older/Younger cabin splits
 
 Younger_Camp_List = [One, Two, Three]
-Older_Camp_List = [Fifteen, Sixteen, Seventeen, Eighteen]
+Older_Camp_List = [Fifteen, Sixteen, Seventeen, Eighteen, Nineteen, Twenty, Twentyone, Twentytwo, Twentythree, Twentyfour, Twentyfive]
 
 YoungerCamp = Camp("Younger Camp", Younger_Camp_List, 0)
 OlderCamp = Camp("Older Camp", Older_Camp_List, 1)
@@ -214,12 +255,27 @@ OlderCamp = Camp("Older Camp", Older_Camp_List, 1)
 
 OlderSchedule = schedule(OlderCamp)
 
-## Insert Picks
+## Insert Picks for each cabin in camps
 
-Fifteen.Picks({"Horseback":28,"Challenge Course":15, })
-Sixteen.Picks({"Horseback":28,"Challenge Course":15})
-Seventeen.Picks({"Horseback":28,"Challenge Course":15})
+Fifteen.Picks({"Basketball":28,"Challenge Course":15, "Soccer":14, "OLS":5, "Drama":7, "Fishing":10, "BYG":9})
+Sixteen.Picks({"Horseback":2,"Challenge Course":19, "Archery":20, "Riflery":18, "Fishing":5, "Soccer":2})
+Seventeen.Picks({"Horseback":18,"Challenge Course":15, "OLS":2, "Dance":4, "Drama":3, "Football":3})
 
+##
+def random_sampling(camp_list):
+    for cabin in camp_list:
+        cabin_picks = random.sample(list(ACTIVITIES), 8)
+        cabin_pick_numbers = random.sample(range(1,50), 8)
+        cabin.Picks(dict(zip(cabin_picks, cabin_pick_numbers)))
+random_sampling(Older_Camp_List)
+
+## Draft for all six periods
 OlderSchedule.draft()
 OlderSchedule.draft()
+OlderSchedule.draft()
+OlderSchedule.draft()
+OlderSchedule.draft()
+OlderSchedule.draft()
+
 printSchedule(OlderSchedule)
+OlderSchedule.open_activities()
