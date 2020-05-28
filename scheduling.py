@@ -12,8 +12,10 @@
     MIT License
 '''
 import random
+import xlrd
+import xlwt
 ## Availible locations around camp which are availible for use during land activities
-
+                    
 LOCATIONS = {"Archery":1,
              "Arts and Crafts":1,
              "Loop":1,
@@ -84,6 +86,11 @@ class Camp:
         self.name = name
         self.type = age_type
 
+    def get_picks(self, cabin_picks):
+        for cabin in self.cabin_list:
+            print(cabin.number)
+            cabin.Picks(cabin_picks[cabin.number])
+
 ## Cabin class which stores the number of campers, their activity preferences,
 class Cabin:
     def __init__(self, number, campers):
@@ -99,7 +106,6 @@ class Cabin:
 
     def Picks(self, picks):
         self.picks = picks
-        self.picked_in_this_round = False
         return self.picks
 
     
@@ -207,7 +213,12 @@ class Schedule:
                 day = "A"
             else:
                 day = "B"
-            print(day,"Day","activity period",period%3+1,"has the following locations availible:\n",self.open_locations[period])
+            temp = {}
+            print("\n",day,"Day","activity period",period%3+1,"has the following locations availible:\n")
+            for a in self.open_locations[period]:
+                if self.open_locations[period][a] > 0:
+                    temp[a] = self.open_locations[period][a]
+            print(temp)
         
             
 def schedule(camp):
@@ -226,13 +237,12 @@ def assignCamps(younger, older):
         Younger.cabin_list.append(cabin)
     for cabin in older:
         Older.cabin_list.append(cabin)
-    
 
 def Change_Schedule(self, current_activity, desired_activity):
     return
         
 
-## Initialize cabins at camp
+ ##Initialize cabins at camp
 One = Cabin("One", 8)
 Two = Cabin("Two", 8)
 Three = Cabin("Three",8)
@@ -244,8 +254,8 @@ Eight = Cabin("Eight",8)
 Nine = Cabin("Nine",8)
 Ten = Cabin("Ten",8)
 Eleven = Cabin("Eleven",8)
-Twleve = Cabin("Twelve",8)
-Thirteen = Cabin("Thriteen",8)
+Twelve = Cabin("Twelve",8)
+Thirteen = Cabin("Thirteen",8)
 Fourteen = Cabin("Fourteen",8)
 Fifteen = Cabin("Fifteen",8)
 Sixteen = Cabin("Sixteen",8)
@@ -264,40 +274,60 @@ Twentyeight = Cabin("Twentyeight", 8)
 Twentynine = Cabin("Twentynine",8)
 Thirty = Cabin("Thirty",8)
 
-## Create Older/Younger cabin splits
+workbook = xlrd.open_workbook('Activities.xlsx')
+worksheet = workbook.sheet_by_index(0)
 
-Younger_Camp_List = [One, Two, Three]
-Older_Camp_List = [Fifteen, Sixteen, Seventeen, Eighteen, Nineteen, Twenty, Twentyone, Twentytwo, Twentythree, Twentyfour, Twentyfive, Twentysix, Twentyseven, Twentyeight, Twentynine, Thirty]
+def get_Picks(worksheet):
+    cabins = {}
+    for row in range(worksheet.nrows):
+        number = worksheet.cell_value(row, 0)
+        if row > 0:
+            cabins[number] = {}
+            for col in range(worksheet.ncols):
+                if col > 0:
+                    if worksheet.cell_value(row, col) != xlrd.empty_cell.value:
+                        cabins[number][worksheet.cell_value(0, col)] = int(worksheet.cell_value(row, col))
+    return cabins
+    
+cabin_picks = get_Picks(worksheet)
+
+    
+## Create Older/ounger cabin splits
+
+Younger_Camp_List = [One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Eleven, Twelve, Thirteen, Fourteen, Twentythree]
+Older_Camp_List = [Fifteen, Sixteen, Seventeen, Eighteen, Nineteen, Twenty, Twentyone, Twentytwo, Twentyfour, Twentyfive, Twentysix, Twentyseven, Twentyeight, Twentynine, Thirty]
 
 YoungerCamp = Camp("Younger Camp", Younger_Camp_List, 0)
 OlderCamp = Camp("Older Camp", Older_Camp_List, 1)
 
+OlderCamp.get_picks(cabin_picks)
+YoungerCamp.get_picks(cabin_picks)
 
 OlderSchedule = schedule(OlderCamp)
+YoungerSchedule = schedule(YoungerCamp)
 
-## Insert Picks for each cabin in camps
-
-Fifteen.Picks({"Basketball":28,"Challenge Course":15, "Soccer":14, "OLS":5, "Drama":7, "Fishing":10, "BYG":9})
-Sixteen.Picks({"Horseback":2,"Challenge Course":19, "Archery":20, "Riflery":18, "Fishing":5, "Soccer":2})
-Seventeen.Picks({"Horseback":18,"Challenge Course":15, "OLS":2, "Dance":4, "Drama":3, "Football":3})
-
-##
+## random_sampling for testing
 def random_sampling(camp_list):
     for cabin in camp_list:
         cabin_picks = random.sample(list(ACTIVITIES), 10)
         cabin_pick_numbers = random.sample(range(1,50), 10)
         cabin.Picks(dict(zip(cabin_picks, cabin_pick_numbers)))
-random_sampling(Older_Camp_List)
+        
+## Uncomment for random sampling to test without excell input
+## random_sampling(Older_Camp_List)
 
-for cabin in Older_Camp_List:
-    print(cabin.picks)
 ## Draft for all six periods
+        
 OlderSchedule.draft()
 OlderSchedule.draft()
 OlderSchedule.draft()
 OlderSchedule.draft()
 OlderSchedule.draft()
 OlderSchedule.draft()
+
+YoungerSchedule.draft()
 
 printSchedule(OlderSchedule)
 OlderSchedule.open_activities()
+
+
