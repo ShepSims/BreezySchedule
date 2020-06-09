@@ -18,6 +18,7 @@ import xlwt
                     
 LOCATIONS = {"Archery":1,
              "Arts and Crafts":1,
+             "Baseball":1,
              "Loop":1,
              "Duke":1,
              "Baseball Field":1,
@@ -34,16 +35,13 @@ LOCATIONS = {"Archery":1,
              "Chapel Point Field":1,
              "Golf Field 1":1,
              "Golf Field 2":1,
-             "Guitar":1,
              "OLS":1,
-             "Pottery":1,
              "Riflery":1,
              "Tennis":1,
              "Volleyball":1,
              "Tree Climbing":1,
              "Gaga":1,
              "Disc Golf":2,
-             "Horseback":1,
              "Putt Putt":1}
 
 ## Activity class definition
@@ -59,25 +57,23 @@ ACTIVITIES = {"Archery":"Archery",
               "Athletic Conditioning":"Loop",
               "BYG":"Duke",
               "Basketball":["Basketball Court","Duke"],
+              "Baseball":"Baseball",
               "Challenge Course":"Challenge Course",
-              "Drama":["Rec Hall","Rec Hall Porch", "Ampitheatre"],
-              "Dance":["Rec Hall","Rec Hall Porch", "Ampitheatre"],
-              "Cheer":["Rec Hall","Rec Hall Porch", "Ampitheatre"],
+              "Drama":["Rec Hall Porch", "Ampitheatre"],
+              "Dance":["Rec Hall Porch", "Ampitheatre"],
+              "Cheer":["Rec Hall Porch", "Ampitheatre"],
               "Fishing":"Fishing",
               "Soccer":["GA Field 1","GA Field 2", "GA Field 3", "Golf Field 1", "Golf Field 2"],
               "Flag Football":["GA Field 1","GA Field 2", "GA Field 3", "Chapel Point Field", "Golf Field 1", "Golf Field 2"],
               "Ultimate":["Golf Field 1", "Golf Field 2", "Chapel Point Field","GA Field 1","GA Field 2", "GA Field 3","Flagpole Field"],
               "Lacrosse":["GA Field 1","GA Field 2", "GA Field 3", "Golf Field 1", "Golf Field 2"],
-              "Guitar":"Guitar",
               "OLS":"OLS",
-              "Pottery":"Pottery",
               "Riflery": "Riflery",
               "Tennis":"Tennis",
               "Volleyball":"Volleyball",
               "Tree Climbing":"Tree Climbing",
               "Gaga":"Gaga",
               "Disc Golf":"Disc Golf",
-              "Horseback":"Horseback",
               "Putt Putt":"Putt Putt"}
 
 
@@ -130,8 +126,11 @@ class Schedule:
             self.picks[cabin] = cabin.picks
 
     def get_top_choice(self, cabin):
-        top = max(cabin.picks, key=cabin.picks.get)
-        return (top)
+        try:
+            top = max(cabin.picks, key=cabin.picks.get)
+            return (top)
+        except:
+            print("Cabin", cabin.n, "failed at getting picks!")
     
     def get_cabin_schedule(self, cabin):
         return self.schedule
@@ -139,56 +138,61 @@ class Schedule:
     def assign(self, cabin, activity, location, last_location_to_try = True):
         
     ## Try to assign choice location to cabin during any time slot
-        for activity_period in range(6):
+        try:
+            for activity_period in range(6):
 
-            ## Uncomment for scheulidd walk-through
-##          print("Cabin",cabin.number,"Try activity",activity, "at",location, "during", activity_period, "with current:", self.schedule[cabin]["A-Day"],self.schedule[cabin]["B-Day"])
-            
-            ## If there is an open locaiton for this activity during a cabin's unassigned activity period, assign activity here and decrease the location's openings by 1 for that period
-            if self.open_locations[activity_period][location] != 0:
-                if activity_period == 0 and self.schedule[cabin]["A-Day"]["Period One"] == None:
-                    self.schedule[cabin]["A-Day"]["Period One"] = activity
-                    self.open_locations[activity_period][location] -= 1
-                    cabin.picks.pop(activity)
-                    return True
-                elif activity_period == 1 and self.schedule[cabin]["A-Day"]["Period Two"] == None:
-                    self.schedule[cabin]["A-Day"]["Period Two"] = activity
-                    self.open_locations[activity_period][location] -= 1
-                    cabin.picks.pop(activity)
-                    return True
-                elif activity_period == 2 and self.schedule[cabin]["A-Day"]["Period Three"] == None:
-                    self.schedule[cabin]["A-Day"]["Period Three"] = activity
-                    self.open_locations[activity_period][location] -= 1
-                    cabin.picks.pop(activity)
-                    return True
-                elif activity_period == 3 and self.schedule[cabin]["B-Day"]["Period One"] == None:
-                    self.schedule[cabin]["B-Day"]["Period One"] = activity
-                    self.open_locations[activity_period][location] -= 1
-                    cabin.picks.pop(activity)
-                    return True
-                elif activity_period == 4 and self.schedule[cabin]["B-Day"]["Period Two"] == None:
-                    self.schedule[cabin]["B-Day"]["Period Two"] = activity
-                    self.open_locations[activity_period][location] -= 1
-                    cabin.picks.pop(activity)
-                    return True
-                elif activity_period == 5 and self.schedule[cabin]["B-Day"]["Period Three"] == None:
-                    self.schedule[cabin]["B-Day"]["Period Three"] = activity
-                    self.open_locations[activity_period][location] -= 1
-                    cabin.picks.pop(activity)
-                    return True
-
-            ## If you have tried to put the cabin's top activity into the schedule but there were no slots, raise their next top activity's preference score and try again
-                #if activity_period == 5:
-                    #print("Cabin",cabin.number,"Activity:",activity, "at",location, "during", activity_period, "with current:", self.schedule[cabin]["A-Day"],self.schedule[cabin]["B-Day"])
-            if activity_period == 5 and last_location_to_try == True:
-                increase_next_choice = cabin.picks.pop(activity)/2
-
-                # Uncomment to see which cabin's got picks boosted because their top chioces were already taken
-                # print("Cabin:",cabin.number, "gets",self.get_top_choice(cabin),"boosted by",increase_next_choice)
+                ## Uncomment for scheulidd walk-through
+    ##          print("Cabin",cabin.number,"Try activity",activity, "at",location, "during", activity_period, "with current:", self.schedule[cabin]["A-Day"],self.schedule[cabin]["B-Day"])
                 
-                new_activity = self.get_top_choice(cabin)
-                cabin.picks[new_activity]+=increase_next_choice
-                return False
+                ## If there is an open locaiton for this activity during a cabin's unassigned activity period, assign activity here and decrease the location's openings by 1 for that period
+                if self.open_locations[activity_period][location] != 0:
+                    if activity_period == 0 and self.schedule[cabin]["A-Day"]["Period One"] == None:
+                        self.schedule[cabin]["A-Day"]["Period One"] = activity
+                        self.open_locations[activity_period][location] -= 1
+                        cabin.picks.pop(activity)
+                        return True
+                    elif activity_period == 1 and self.schedule[cabin]["A-Day"]["Period Two"] == None:
+                        self.schedule[cabin]["A-Day"]["Period Two"] = activity
+                        self.open_locations[activity_period][location] -= 1
+                        cabin.picks.pop(activity)
+                        return True
+                    elif activity_period == 2 and self.schedule[cabin]["A-Day"]["Period Three"] == None:
+                        self.schedule[cabin]["A-Day"]["Period Three"] = activity
+                        self.open_locations[activity_period][location] -= 1
+                        cabin.picks.pop(activity)
+                        return True
+
+                    ## Include limitation on Putt Putt since day camp uses that location in the afternoons except friday
+                    elif activity_period == 3 and self.schedule[cabin]["B-Day"]["Period One"] == None and not activity == "Putt Putt":
+                        self.schedule[cabin]["B-Day"]["Period One"] = activity
+                        self.open_locations[activity_period][location] -= 1
+                        cabin.picks.pop(activity)
+                        return True
+                    elif activity_period == 4 and self.schedule[cabin]["B-Day"]["Period Two"] == None and not activity == "Putt Putt":
+                        self.schedule[cabin]["B-Day"]["Period Two"] = activity
+                        self.open_locations[activity_period][location] -= 1
+                        cabin.picks.pop(activity)
+                        return True
+                    elif activity_period == 5 and self.schedule[cabin]["B-Day"]["Period Three"] == None and not activity == "Putt Putt":
+                        self.schedule[cabin]["B-Day"]["Period Three"] = activity
+                        self.open_locations[activity_period][location] -= 1
+                        cabin.picks.pop(activity)
+                        return True
+
+                ## If you have tried to put the cabin's top activity into the schedule but there were no slots, raise their next top activity's preference score and try again
+                    #if activity_period == 5:
+                        #print("Cabin",cabin.number,"Activity:",activity, "at",location, "during", activity_period, "with current:", self.schedule[cabin]["A-Day"],self.schedule[cabin]["B-Day"])
+                if activity_period == 5 and last_location_to_try == True:
+                    increase_next_choice = cabin.picks.pop(activity)/2
+
+                    # Uncomment to see which cabin's got picks boosted because their top chioces were already taken
+                    # print("Cabin:",cabin.number, "gets",self.get_top_choice(cabin),"boosted by",increase_next_choice)
+                    
+                    new_activity = self.get_top_choice(cabin)
+                    cabin.picks[new_activity]+=increase_next_choice
+                    return False
+        except:
+            print ("Sorry you didn't get an activity cabin",cabin.n)
 
     '''
     Try assigning an activity for each location that the cabin's top choice can be done at
@@ -314,8 +318,13 @@ Twentyseven = Cabin("Twentyseven", 27)
 Twentyeight = Cabin("Twentyeight", 28)
 Twentynine = Cabin("Twentynine",29)
 Thirty = Cabin("Thirty",30)
+Thirtyone = Cabin("Thirtyone",31)
+Thirtytwo = Cabin("Thirtytwo",32)
+Thirtythree = Cabin("Thirtythree",33)
+Thirtyfour = Cabin("Thirtyfour",34)
+Thirtyfive = Cabin("Thirtyfive",35)
 
-workbook = xlrd.open_workbook('Activities.xlsx')
+workbook = xlrd.open_workbook('Land Activity Preferences.xlsx')
 worksheet = workbook.sheet_by_index(0)
 
 def get_Picks(worksheet):
@@ -332,6 +341,9 @@ def get_Picks(worksheet):
     
 cabin_picks = get_Picks(worksheet)
 
+
+mystyle = xlwt.easyxf('pattern: pattern solid, fore_colour blue')
+
 def export_Picks(schedule, filename):
     wb = xlwt.Workbook()
     ws = wb.add_sheet(schedule.name)
@@ -341,35 +353,40 @@ def export_Picks(schedule, filename):
     ws.write(0,4, "B-Day Period 1")
     ws.write(0,5, "B-Day Period 2")
     ws.write(0,6, "B-Day Period 3")
+    c = 1
     for item in schedule.schedule:
-        ws.write(item.n, 0, item.number)
+        ws.write(c, 0, item.number)
         i = 0
         for day in schedule.schedule[item]:
             j = 1
             for a in schedule.schedule[item][day]:
                 if i == 0:
-                    ws.write(item.n, j, schedule.schedule[item][day][a])
+                    ws.write(c, j, schedule.schedule[item][day][a])
                 else:
-                    ws.write(item.n, j+3, schedule.schedule[item][day][a])
+                    ws.write(c, j+3, schedule.schedule[item][day][a])
                 j+=1
             i+=1
+        c+=1
     wb.save(filename)
     
 ## Create Older/ounger cabin splits
-
-Younger_Camp_List = [One, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Eleven, Twelve, Thirteen, Fourteen, Fifteen]
-Older_Camp_List = [Seven, Nine]
+yg = 1, 2, 4, 5, 6
+mg = 25,26,27
+Younger_Camp_List = [One, Two, Four, Five, Six, Seven, Eight, Nine, Ten, Eleven, Twentyfive]
+Older_Camp_List = [Twentysix, Twentyseven, Fifteen, Sixteen, Thirty, Thirtytwo, Thirtythree, Thirtyfour, Thirtyfive, Nineteen, Twenty, Twentyone, Twentytwo]
 
 YoungerCamp = Camp("Younger Camp", Younger_Camp_List, 0)
 OlderCamp = Camp("Older Camp", Older_Camp_List, 1)
 
 OlderCamp.get_picks(cabin_picks)
+##for cabin in Older_Camp_List:
+##    print(cabin.number, cabin.Picks)
 YoungerCamp.get_picks(cabin_picks)
 
 OlderSchedule = schedule(OlderCamp, "Older Camp Schedule")
 YoungerSchedule = schedule(YoungerCamp, "Younger Camp Schedule")
 
-## random_sampling for testing
+## Create random sampling of activity preferences for all cabins to use for testing
 def random_sampling(camp_list):
     for cabin in camp_list:
         cabin_picks = random.sample(list(ACTIVITIES), 10)
@@ -378,17 +395,17 @@ def random_sampling(camp_list):
         
 ## Uncomment for random sampling to test without excell input
 ## random_sampling(Older_Camp_List)
+## random_sampling(Younger_Camp_List)
 
 ## Draft for all six periods
 for i in range(6):
     YoungerSchedule.draft()
+    OlderSchedule.draft()
 
 #printSchedule(OlderSchedule)
-#OlderSchedule.open_activities()
-#OlderSchedule.print_open_activities()
+YoungerSchedule.print_open_activities()
 #YoungerSchedule.open_activities()
-printSchedule(YoungerSchedule)
 export_Picks(YoungerSchedule, "Younger-Schedule.xls")
-#printSchedule(OlderSchedule)
+export_Picks(OlderSchedule, "Older-Schedule.xls")
 
 
