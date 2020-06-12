@@ -47,7 +47,10 @@ LOCATIONS = {"Archery":1,
              "Water Toys":3,
              "Rec Swim":2,
              "Pool":3,
-             "paddle":2}
+             "paddle":2,
+             "Sail":0,
+             "Slip n Slide":0,
+             "Pottery":0}
 
 ## Activity class definition
 class Activity:
@@ -81,8 +84,13 @@ ACTIVITIES = {"Archery":"Archery",
               "Disc Golf":"Disc Golf",
               "Putt Putt":"Putt Putt",
               "Pool":"Pool",
-              "Tubing":"Ski Tower",
-              "PATTL":"Paddle"}
+              "Ski":"Ski",
+              "PATTL":"Paddle",
+              "Sail":"Sail",
+              "Water Toys":"Water Toys",
+              "Rec Swim":"Rec Swim",
+              "Slip n Slide":"Slip n Slide",
+              "Pottery":"Pottery"}
 
 
 ## Camp class to be used in seperating and dealing with older vs younger camps
@@ -101,7 +109,7 @@ class Cabin:
     def __init__(self, number, n, periods):
         self.number = number
         self.n = n
-        self.picks = None
+        self.picks = {}
         self.periods = periods
         self.Activities = {self.periods[0]:None,
                                  self.periods[1]:None,
@@ -129,7 +137,20 @@ class Schedule:
             self.schedule[cabin] = cabin.Activities
 
         for cabin in cabins:
-            self.picks[cabin] = cabin.picks
+            if cabin.picks != {}:
+                self.picks[cabin] = cabin.picks
+            else:
+                self.picks[cabin] = self.random_sampling(cabin)
+
+    
+    ## Create random sampling of activity preferences for cabins if they dont submit prefs
+    def random_sampling(self, cabin):
+        choice = [0, -1, -2, -3 ,-4, 5, 4, 3, 2, 1]
+        cabin_picks = random.sample(list(ACTIVITIES), 10)
+        random.shuffle(choice)
+        picks = dict(zip(cabin_picks, choice))
+        cabin.picks = picks
+        return picks
 
     def get_top_choice(self, cabin):
         try:
@@ -145,23 +166,23 @@ class Schedule:
         
     ## Try to assign choice location to cabin during any time slot
         try:
-            for activity_period in range(6):
+            for activity_period in range(1,7):
 
-                ## Uncomment for scheulidd walk-through
+                ## Uncomment for scheduling walk-through
     ##          print("Cabin",cabin.number,"Try activity",activity, "at",location, "during", activity_period, "with current:", self.schedule[cabin]["A-Day"],self.schedule[cabin]["B-Day"])
                 
                 ## If there is an open locaiton for this activity during a cabin's unassigned activity period, assign activity here and decrease the location's openings by 1 for that period
                 if self.open_locations[activity_period][location] != 0:
-                    if activity_period in self.schedule[cabin].Activities:
+                    if activity_period in cabin.Activities and cabin.Activities[activity_period] == None:
                         self.schedule[cabin][activity_period] = activity
                         self.open_locations[activity_period][location] -= 1
                         cabin.picks.pop(activity)
                         return True
-                    
+                
                 ## If you have tried to put the cabin's top activity into the schedule but there were no slots, raise their next top activity's preference score and try again
-                    #if activity_period == 5:
-                        #print("Cabin",cabin.number,"Activity:",activity, "at",location, "during", activity_period, "with current:", self.schedule[cabin]["A-Day"],self.schedule[cabin]["B-Day"])
-                if activity_period == 5 and last_location_to_try == True:
+##                if activity_period == 6:
+##                    print("Cabin",cabin.number,"Activity:",activity, "at",location, "during", activity_period, "with current:", self.schedule[cabin]["A-Day"],self.schedule[cabin]["B-Day"])
+                if activity_period == 6 and last_location_to_try == True:
                     increase_next_choice = cabin.picks.pop(activity)/2
 
                     # Uncomment to see which cabin's got picks boosted because their top chioces were already taken
@@ -171,6 +192,7 @@ class Schedule:
                     cabin.picks[new_activity]+=increase_next_choice
                     return False
         except:
+            #print(cabin.n, "Current",cabin.Activities)
             print ("Sorry you didn't get an activity cabin",cabin.n)
 
     '''
@@ -303,7 +325,7 @@ Thirtythree = Cabin("Thirtythree",33,[2,3,6])
 Thirtyfour = Cabin("Thirtyfour",34,[2,3,6])
 Thirtyfive = Cabin("Thirtyfive",35, [2,3,6])
 
-workbook = xlrd.open_workbook('Land Activity Preferences.xlsx')
+workbook = xlrd.open_workbook('Freeday Prefs.xlsx')
 worksheet = workbook.sheet_by_index(0)
 
 def get_Picks(worksheet):
@@ -326,25 +348,19 @@ mystyle = xlwt.easyxf('pattern: pattern solid, fore_colour blue')
 def export_Picks(schedule, filename):
     wb = xlwt.Workbook()
     ws = wb.add_sheet(schedule.name)
-    ws.write(0,1, "A-Day Period 1")
-    ws.write(0,2, "A-Day Period 2")
-    ws.write(0,3, "A-Day Period 3")
-    ws.write(0,4, "B-Day Period 1")
-    ws.write(0,5, "B-Day Period 2")
-    ws.write(0,6, "B-Day Period 3")
+    ws.write(0,1, "2:00-3:00")
+    ws.write(0,2, "3:00-4:00")
+    ws.write(0,3, "4:00-5:00")
+    ws.write(0,4, "5:00-6:00")
+    ws.write(0,5, "6:00-7:00")
+    ws.write(0,6, "7:00-8:00")
     c = 1
-    for item in schedule.schedule:
-        ws.write(c, 0, item.number)
+    for cabin in schedule.schedule:
+        ws.write(c, 0, cabin.number)
         i = 0
-        for day in schedule.schedule[item]:
-            j = 1
-            for a in schedule.schedule[item][day]:
-                if i == 0:
-                    ws.write(c, j, schedule.schedule[item][day][a])
-                else:
-                    ws.write(c, j+3, schedule.schedule[item][day][a])
-                j+=1
-            i+=1
+        for period in schedule.schedule[cabin]:
+            ws.write(c, period, schedule.schedule[cabin][period])
+                
         c+=1
     wb.save(filename)
     
@@ -353,24 +369,22 @@ yg = 1, 2, 4, 5, 6
 mg = 25,26,27
 Younger_Camp_List = [One, Two, Four, Five, Six, Seven, Eight, Nine, Ten, Eleven, Twentyfive]
 Older_Camp_List = [Twentysix, Twentyseven, Fifteen, Sixteen, Thirty, Thirtytwo, Thirtythree, Thirtyfour, Thirtyfive, Nineteen, Twenty, Twentyone, Twentytwo]
+ALL_CAMP = Younger_Camp_List + Older_Camp_List
 
 YoungerCamp = Camp("Younger Camp", Younger_Camp_List, 0)
 OlderCamp = Camp("Older Camp", Older_Camp_List, 1)
+ALLCAMP = Camp("All Camp", ALL_CAMP, 2)
 
-OlderCamp.get_picks(cabin_picks)
+#OlderCamp.get_picks(cabin_picks)
 ##for cabin in Older_Camp_List:
 ##    print(cabin.number, cabin.Picks)
-YoungerCamp.get_picks(cabin_picks)
+#YoungerCamp.get_picks(cabin_picks)
+#ALL_CAMP.get_picks(cabin_picks)
 
 OlderSchedule = schedule(OlderCamp, "Older Camp Schedule")
 YoungerSchedule = schedule(YoungerCamp, "Younger Camp Schedule")
+ALL_CAMP_SCHEDULE = schedule(ALLCAMP, "All Camp Schedule")
 
-## Create random sampling of activity preferences for all cabins to use for testing
-def random_sampling(camp_list):
-    for cabin in camp_list:
-        cabin_picks = random.sample(list(ACTIVITIES), 10)
-        cabin_pick_numbers = random.sample(range(1,50), 10)
-        cabin.Picks(dict(zip(cabin_picks, cabin_pick_numbers)))
         
 ## Uncomment for random sampling to test without excell input
 ## random_sampling(Older_Camp_List)
@@ -382,9 +396,10 @@ for i in range(6):
     OlderSchedule.draft()
 
 #printSchedule(OlderSchedule)
-YoungerSchedule.print_open_activities()
+#YoungerSchedule.print_open_activities()
 #YoungerSchedule.open_activities()
-export_Picks(YoungerSchedule, "Younger-Schedule.xls")
-export_Picks(OlderSchedule, "Older-Schedule.xls")
+
+export_Picks(YoungerSchedule, "Younger-Freeday-Schedule.xls")
+export_Picks(OlderSchedule, "Older-Freeday-Schedule.xls")
 
 
