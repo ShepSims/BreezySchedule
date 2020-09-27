@@ -563,8 +563,8 @@ def main():
     export_Schedule(OlderSchedule, 'Older-Schedule.xls')
 
     '''Uncomment to print cabins which had suboptimal assignments'''
-    #print(YoungerSchedule.sad_cabins)
-    #print(OlderSchedule.sad_cabins)
+    print(YoungerSchedule.sad_cabins)
+    print(OlderSchedule.sad_cabins)
 
 if __name__ == "__main__":
     main()
