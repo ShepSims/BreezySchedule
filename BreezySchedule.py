@@ -359,7 +359,7 @@ def get_Prefs(worksheet):
 
 def export_Schedule(schedule, filename):
     '''
-    Exports the provided schedule to filename.xlsx
+    Exports the provided schedule to filename.xls
 
     parameters:
         schedule - a Schedule object
@@ -519,7 +519,7 @@ def main():
     Thirtyfour = Cabin('Thirtyfour',34)
     Thirtyfive = Cabin('Thirtyfive',35)
 
-    workbook = xlrd.open_workbook('Land Activity Preferences.xlsx')
+    workbook = xlrd.open_workbook('Land Activity Preferences.xls')
     worksheet = workbook.sheet_by_index(0)
 
     cabin_prefs = get_Prefs(worksheet)
