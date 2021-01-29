@@ -17,7 +17,7 @@ Update Land Activity Preferences.xls with the group's preferences and save as xl
 
 In a terminal shell cd'ed into the folder you cloned into
 
-```source bin/activate```
+```source bin/activate``` <br>
 ```python3 -m BreezySchedule```
 
 
