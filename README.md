@@ -18,7 +18,9 @@ Update Land Activity Preferences.xls with the group's preferences and save as xl
 In a terminal shell cd'ed into the folder you cloned into
 
 ```source bin/activate``` <br>
-```python3 -m BreezySchedule```
+```python3 -m BreezySchedule```<br>
+
+The output activity period schedules are saved into xls files in the cloned directory.  You can also use the provided schedules from summer 2020 as templates to build around if social distancing is required for mealtimes.
 
 
 *Note that xlrd/xlwt does not support xlsx filetypes produced by Excel 2010 or newer so you'll need to convert them by clicking File/SaveAs in excel and selecting xls if you create a new file instead of using the provided "Land Activity Preferences.xls"*
