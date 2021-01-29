@@ -2,9 +2,31 @@
 
 A scheduling assistant built for YMCA Camp Thunderbird during the COVID-19 pandemic to assist with rapid schedule prototyping and deployment.
 
-This repository contains everything you need to use python-based program "breezyschedule.py" to create optimized schedules for groups or individuals.
+This repository contains everything you need to use python-based program "breezyschedule.py" to create optimized schedules for groups (or individuals with some tinkering).
+
+To use:
+
+Download/Install Python3
+
+Clone this repository to your local machine.
+```git clone https://github.com/ShepSims/BreezySchedule/"```
+
+Add availible activities and cabins to respective arrays in BreezySchedule.py
+
+Update Land Activity Preferences.xls with the group's preferences and save as xls.  
+
+In a terminal shell cd'ed into the folder you cloned into
+
+```source bin/activate```
+```python3 -m BreezySchedule```
+
+
+*Note that xlrd/xlwt does not support xlsx filetypes produced by Excel 2010 or newer so you'll need to convert them by clicking File/SaveAs in excel and selecting xls if you create a new file instead of using the provided "Land Activity Preferences.xls"*
+
+
 
 The core algorithmic processes live in the draft and assign methods of the Schedule class, comprehensively explained below for convenience.  
+
 
 ```
 def draft(self):
