@@ -13,6 +13,7 @@ import random
 import xlrd
 import xlwt
 
+## Configure limitations on open locations day to day here 
 
 LIMITATIONS = {"Ski":[1,2,3,4,5,6,7,8],
                "Sail":[9,10,11,12,13,14,15,16],
@@ -371,7 +372,7 @@ Thirtythree = Cabin("Thirtythree",33,Older)
 Thirtyfour = Cabin("Thirtyfour",34,Older)
 Thirtyfive = Cabin("Thirtyfive",35, Older)
 
-workbook = xlrd.open_workbook('Freeday Prefs.xlsx')
+workbook = xlrd.open_workbook('Freeday Prefs.xls')
 worksheet = workbook.sheet_by_index(0)
 
 def get_Picks(worksheet):
@@ -438,7 +439,7 @@ ALLCAMP = Camp("All Camp", ALL_CAMP, 2)
 OlderSchedule = schedule(OlderCamp, "Older Camp Schedule")
 YoungerSchedule = schedule(YoungerCamp, "Younger Camp Schedule")
 ALL_CAMP_SCHEDULE = schedule(ALLCAMP, "All Camp Schedule")
-ALL_CAMP_SCHEDULE.get_picks('Freeday Prefs.xlsx')
+ALL_CAMP_SCHEDULE.get_picks('Freeday Prefs.xls')
 
         
 ## Uncomment for random sampling to test without excell input
