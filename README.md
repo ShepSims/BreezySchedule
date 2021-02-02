@@ -4,6 +4,8 @@ A scheduling assistant built for YMCA Camp Thunderbird during the COVID-19 pande
 
 This repository contains everything you need to use python-based program "breezyschedule.py" to create optimized schedules for groups (or individuals with some tinkering).
 
+![Example](Schedules/Example.png)
+
 **To use**
 
 Download/Install Python3
