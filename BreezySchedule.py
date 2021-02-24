@@ -20,14 +20,16 @@ import random
 import xlrd
 import xlwt
 
-class Camp:
-    '''
-    Camps are used to define groups of cabins running on different schedules
 
-    parameters:
+'''
+Camps are used to define groups of cabins running on different schedules i.e. Older vs. Younger NOT East Camp vs OG, because they run on the same activity schedules
+
+parameters:
     cabin_list  - A list of the cabins in Camp object (ex. [One, Two, Three])
     name        - Name of the camp (ex. 'Older' or 'Younger')
-    '''
+'''
+class Camp:
+    
     
     def __init__(self, name, cabin_list):
         '''
@@ -47,10 +49,9 @@ class Camp:
         '''
         for cabin in self.cabin_list:
             cabin.prefs = cabin_prefs[cabin.number]
-            
 
-class Cabin:
-    '''
+            
+'''
     Cabin objects store activity preferences and schedules for a particular cabin
 
     Attributes:
@@ -58,7 +59,9 @@ class Cabin:
         n          - The cabin number as int (ex. 1)
         prefs      - The cabin's activity preferences, empty until global function get_prefs is invoked
         Activities - The cabin's assigned schedule of activities
-    '''
+'''
+class Cabin:
+    
     
     def __init__(self, number, n):
         '''
@@ -78,9 +81,9 @@ class Cabin:
                                  'Period Two':None,
                                  'Period Three':None}}
 
-    
-class Schedule:
-    '''
+
+
+'''
     Schedule objects contain all information about schedules for the associated cabins and locations
 
     Attributes:
@@ -95,7 +98,16 @@ class Schedule:
                 {Cabin:{'A-Day':{A-Day Schedule}, 'B-Day':{B-Day Schedule}}, Cabin:{'A-Day':{A-Day Schedule}, 'B-Day':{B-Day Schedule}],...]
             ex:
                 {One:{'A-Day':{'Period One':'Archery', 'Period Two':'BYG', 'Period Three':'Tennis'}, 'B-Day':{'Period One':'ATC', 'Period Two':'Pottery', 'Period Three':'Tennis'}}, Tw...]
-    '''
+
+    Methods:
+    get_top_choice(cabin)   - returns cabin's top activity choice from availible activities
+    assign(cabin, activity, location, last_location_to_try = True) - tries each period to add activity to the cabin's schedule, and bumps the weight of the next poreference if not
+    assign_activity(cabin, activity) - tries to 
+
+
+'''  
+class Schedule:
+    
     def __init__(self, name, cabins, periods, activity_list, locations):
         '''
         Initializes Schedule object with empty schedules for each cabin object and parameters inherited from Globals unless defined when calling this constructor
@@ -223,7 +235,7 @@ class Schedule:
 
     def assign_activity(self, cabin):
         '''
-        Loops through each location of a cabin's top choice activity, assigning to the cabin's schedule if an poen location is found
+        Loops through each location of a cabin's top choice activity, assigning to the cabin's schedule if an open location is found
 
         parameters:
             cabin - The cabin to try to assign top activity choice to
